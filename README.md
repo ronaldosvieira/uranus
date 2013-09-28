@@ -1,0 +1,1 @@
+Uranus é um simulador da linguagem Assembly para a arquitetura MIPS, desenvolvido - em Java - por alunos do curso de Ciência da Computação da Universidade Federal Rural do Rio de Janeiro.
