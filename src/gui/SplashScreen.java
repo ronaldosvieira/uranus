@@ -11,10 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JWindow;
 
 public class SplashScreen extends JWindow {
-    
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	private int duration;
     
@@ -22,15 +19,15 @@ public class SplashScreen extends JWindow {
         duration = d;
     }
     
-// Este é um método simples para mostrar uma tela de apresentção
+    // Este eh um metodo simples para mostrar uma tela de apresentacao
 
-// no centro da tela durante a quantidade de tempo passada no construtor
+    // no centro da tela durante a quantidade de tempo passada no construtor
 
     public void showSplash() {        
         JPanel content = (JPanel)getContentPane();
         content.setBackground(Color.white);
         
-        // Configura a posição e o tamanho da janela
+        // Configura a posicao e o tamanho da janela
         int width = 450;
         int height = 253;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -38,11 +35,11 @@ public class SplashScreen extends JWindow {
         int y = (screen.height-height)/2;
         setBounds(x,y,width,height);
         
-        // Constrói o splash screen
+        // Constroi o splash screen
         JLabel label = new JLabel(new ImageIcon(getClass().getResource("/img/uranus.jpg")));
         content.add(label, BorderLayout.CENTER);
 
-        // Torna visível
+        // Torna visivel
         setVisible(true);
         
         // Espera ate que os recursos estejam carregados

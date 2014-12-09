@@ -1,164 +1,174 @@
 package simulador;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import java.util.ArrayList;
 
 public class UC {	
 	
 	public ULA ula;
-	public Memoria m;
+	public Memory m;
 	public Processador p;
-	public Constante c = new Constante();
-	public ArrayList<String> list = new ArrayList<String>();
+	public ArrayList<String> list;
 	public int pc;
 	public String linhaAtual;
 	
-	public UC(Memoria m, Processador p, ULA u, Assembler a){
+	public UC(Memory m, Processador p, ULA u, Assembler a){
 		this.m = m;
 		this.p = p;
 		this.ula = u;
 		this.list = a.instrucoes;
 		this.pc = 0;
+
+		this.list = new ArrayList<>();
 	}
 	
-	public boolean getInstruction() throws ErroAcesso, IntegerOutofRange, Overflow{
+	public boolean getInstruction() throws ErroAcesso, IntegerOutofRangeException, OverflowException {
 		for(int i=0; i<list.size(); i++){
 			if(list.get(i).matches("\\s*\\D+:\\s*")) list.remove(i);
 		}
 		
 		String function;
-		Registrador rs;
-		Registrador rt;
-		Registrador rd;
+		Register rs;
+		Register rt;
+		Register rd;
 		int shamt;
 		int imediato;
 		String instrucao;
-		if(m.getInstrucao(pc)!=null){
+		if(m.getWord(pc)!=null){
 			linhaAtual = list.get(pc/4);
-			instrucao = m.getInstrucao(pc);
+			instrucao = m.getWord(pc);
 			if(instrucao.startsWith("000000")){
 				function = instrucao.substring(26,32);
-				if(function.equals("100000")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));					
-					ula.add(rs, rt, rd);
-				}
-				else if(function.equals("100001")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));					
-					ula.addu(rs, rt, rd);
-				}
-				else if(function.equals("100010")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.sub(rs, rt, rd);
-				}
-				else if(function.equals("100011")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.subu(rs, rt, rd);
-				}
-				else if(function.equals("100100")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.and(rs, rt, rd);
-				}
-				else if(function.equals("100101")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.or(rs, rt, rd);
-				}
-				else if(function.equals("100111")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.nor(rs, rt, rd);
-				}
-				else if(function.equals("101010")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.slt(rs, rt, rd);
-				}
-				else if(function.equals("101011")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					ula.sltu(rs, rt, rd);
-				}
-				else if(function.equals("011000")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					Registrador hi = p.getRegister("hi");
-					Registrador lo = p.getRegister("lo");
-					ula.mult(rs, rt, hi, lo);					
-				}
-				else if(function.equals("011010")){
-					rs = p.getRegister(instrucao.substring(6, 11));
-					rt = p.getRegister(instrucao.substring(11, 16));
-					Registrador hi = p.getRegister("hi");
-					Registrador lo = p.getRegister("lo");
-					ula.div(rs, rt, hi, lo);		
-				}
-				else if(function.equals("010000")){
-					rd = p.getRegister(instrucao.substring(16,21));
-					Registrador hi = p.getRegister("hi");
-					ula.mfhi(rd, hi);
-				}
-				else if(function.equals("010010")){
-					rd = p.getRegister(instrucao.substring(16,21));
-					Registrador lo = p.getRegister("lo");
-					ula.mflo(rd, lo);
-				}
-				else if(function.equals("000010")){
-					rt = p.getRegister(instrucao.substring(11, 16));
-					rd = p.getRegister(instrucao.substring(16, 21));
-					shamt = Integer.parseInt(instrucao.substring(21, 26),2);
-					ula.srl(rt, rd, shamt);
-				}
-				else if(function.equals("000000")){
-					rt = p.getRegister(instrucao.substring(11,16));
-					rd = p.getRegister(instrucao.substring(16,21));
-					shamt = Integer.parseInt(instrucao.substring(21,26),2);
-					ula.sll(rt, rd, shamt);
-				}
-				else if(function.equals("001000")){
-					pc = p.getRegister(instrucao.substring(6,11)).getValor();
-				}
-				else if(function.equals("001100")){
-					rt = p.getRegister(instrucao.substring(11,16));
-					rd = p.getRegister(instrucao.substring(16,21));					
-					if(rt.getValor()==1) Uranus.ig.writeln(Integer.toString(rd.getValor()));//System.out.println(rd.getValor());
-					else if(rt.getValor()==10) return false;
+				switch (function) {
+					case "100000":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.add(rs, rt, rd);
+						break;
+					case "100001":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.addu(rs, rt, rd);
+						break;
+					case "100010":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.sub(rs, rt, rd);
+						break;
+					case "100011":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.subu(rs, rt, rd);
+						break;
+					case "100100":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.and(rs, rt, rd);
+						break;
+					case "100101":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.or(rs, rt, rd);
+						break;
+					case "100111":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.nor(rs, rt, rd);
+						break;
+					case "101010":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.slt(rs, rt, rd);
+						break;
+					case "101011":
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						ula.sltu(rs, rt, rd);
+						break;
+					case "011000": {
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						Register hi = p.getRegister("hi");
+						Register lo = p.getRegister("lo");
+						ula.mult(rs, rt, hi, lo);
+						break;
+					}
+					case "011010": {
+						rs = p.getRegister(instrucao.substring(6, 11));
+						rt = p.getRegister(instrucao.substring(11, 16));
+						Register hi = p.getRegister("hi");
+						Register lo = p.getRegister("lo");
+						ula.div(rs, rt, hi, lo);
+						break;
+					}
+					case "010000": {
+						rd = p.getRegister(instrucao.substring(16, 21));
+						Register hi = p.getRegister("hi");
+						ula.mfhi(rd, hi);
+						break;
+					}
+					case "010010": {
+						rd = p.getRegister(instrucao.substring(16, 21));
+						Register lo = p.getRegister("lo");
+						ula.mflo(rd, lo);
+						break;
+					}
+					case "000010":
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						shamt = Integer.parseInt(instrucao.substring(21, 26), 2);
+						ula.srl(rt, rd, shamt);
+						break;
+					case "000000":
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						shamt = Integer.parseInt(instrucao.substring(21, 26), 2);
+						ula.sll(rt, rd, shamt);
+						break;
+					case "001000":
+						pc = p.getRegister(instrucao.substring(6, 11)).getValue();
+						break;
+					case "001100":
+						rt = p.getRegister(instrucao.substring(11, 16));
+						rd = p.getRegister(instrucao.substring(16, 21));
+						if (rt.getValue() == 1)
+							Uranus.ui.writeln(Integer.toString(rd.getValue()));//System.out.println(rd.getValue());
+						else if (rt.getValue() == 10) return false;
+						break;
 				}
 			}
 			else if(instrucao.startsWith("001000")){
 				rs = p.getRegister(instrucao.substring(6, 11));
 				rt = p.getRegister(instrucao.substring(11, 16));
-				imediato = c.toInteger(instrucao.substring(16));
+				imediato = Constant.toInteger(instrucao.substring(16));
 				ula.addi(rs, rt, imediato);
 			}
 			else if(instrucao.startsWith("001001")){
 				rs = p.getRegister(instrucao.substring(6, 11));
 				rt = p.getRegister(instrucao.substring(11, 16));
-				imediato = c.toInteger(instrucao.substring(16));
+				imediato = Constant.toInteger(instrucao.substring(16));
 				ula.addiu(rs, rt, imediato);
 			}
 			else if(instrucao.startsWith("001100")){
 				rs = p.getRegister(instrucao.substring(6, 11));
 				rt = p.getRegister(instrucao.substring(11, 16));
-				imediato = (int) c.toUnsignedInteger(instrucao.substring(16));
+				imediato = (int) Constant.toUnsignedInteger(instrucao.substring(16));
 				ula.andi(rs, rt, imediato);
 			}
 			else if(instrucao.startsWith("001101")){
 				rs = p.getRegister(instrucao.substring(6, 11));
 				rt = p.getRegister(instrucao.substring(11, 16));
-				imediato = (int) c.toUnsignedInteger(instrucao.substring(16));
+				imediato = (int) Constant.toUnsignedInteger(instrucao.substring(16));
 				ula.ori(rs, rt, imediato);
 			}
 			else if(instrucao.startsWith("000100")){
@@ -254,7 +264,7 @@ public class UC {
 			}
 			else if(instrucao.startsWith("000011")){ //jump and link
 				imediato = Integer.parseInt(instrucao.substring(6), 2);
-				p.getRegister("11111").setValor(pc);
+				p.getRegister("11111").setValue(pc);
 				pc = imediato-4;
 			}
 			pc +=4;

@@ -48,15 +48,15 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import simulador.Assembler;
-import simulador.Constante;
+import simulador.Constant;
 import simulador.ErroAcesso;
-import simulador.IntegerOutofRange;
-import simulador.Memoria;
-import simulador.Overflow;
+import simulador.IntegerOutofRangeException;
+import simulador.Memory;
+import simulador.OverflowException;
 import simulador.Processador;
 import simulador.UC;
 
-public class InterfaceGrafica {
+public class UI {
 
 	private JFrame frmUranus;
 	private JTable table;
@@ -68,14 +68,14 @@ public class InterfaceGrafica {
 	private JButton btnNovo,btnAbrir,btnSalvar,btnFechar,btnConstruir,btnExecutar,btnExecutarPasso,btnResetar;
 	
 	private Processador p;
-	private Memoria m;
+	private Memory m;
 	private Assembler mont;
 	private UC uc;
 
 	/**
 	 * Create the application.
 	 */
-	public InterfaceGrafica(Processador p, Memoria m, Assembler mont, UC uc){
+	public UI(Processador p, Memory m, Assembler mont, UC uc){
 		this.p = p;
 		this.m = m;
 		this.mont = mont;
@@ -125,7 +125,7 @@ public class InterfaceGrafica {
 		btnNovo.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				addNewEditorTab("Sem Título");
+				addNewEditorTab("Sem Tï¿½tulo");
 			}
 		});
 		
@@ -264,13 +264,13 @@ public class InterfaceGrafica {
 							editor.get(editor.size()-1).setText(construido);
 							
 							
-							writeln("Construído.");
+							writeln("Construï¿½do.");
 						}else{
-							writeError("Não construído.");
+							writeError("Nï¿½o construï¿½do.");
 						}
-					} catch (IntegerOutofRange e) {
+					} catch (IntegerOutofRangeException e) {
 						writeError("Erro: "+e.getMessage());
-						writeError("Não construído.");
+						writeError("Nï¿½o construï¿½do.");
 					}
 					
 					
@@ -285,7 +285,7 @@ public class InterfaceGrafica {
 		btnExecutar.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				while(uc.pc/4 <= m.size() && m.getInstrucao(uc.pc)!=null){
+				while(uc.pc/4 <= m.size() && m.getWord(uc.pc)!=null){
 					int start,end;
 					
 					try {
@@ -300,7 +300,7 @@ public class InterfaceGrafica {
 					
 					try {
 						if(!(uc.getInstruction())) break;
-					} catch (ErroAcesso | IntegerOutofRange | Overflow e2) {
+					} catch (ErroAcesso | IntegerOutofRangeException | OverflowException e2) {
 						writeError(e2.getMessage());
 					}
 					
@@ -316,7 +316,7 @@ public class InterfaceGrafica {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				int start,end;
-				if(uc.pc/4 <= m.size() && m.getInstrucao(uc.pc)!=null){
+				if(uc.pc/4 <= m.size() && m.getWord(uc.pc)!=null){
 					try {
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
 						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(uc.pc/4);
@@ -328,9 +328,9 @@ public class InterfaceGrafica {
 					
 					try {
 						uc.getInstruction();
-					} catch (ErroAcesso | IntegerOutofRange e) {
+					} catch (ErroAcesso | IntegerOutofRangeException e) {
 						writeError("Erro: "+e.getMessage());
-					} catch (Overflow e) {
+					} catch (OverflowException e) {
 						writeError("Erro: "+e.getMessage());
 					}
 					
@@ -476,7 +476,7 @@ public class InterfaceGrafica {
 				int column = e.getColumn();
 				String novoValor = (String) table.getModel().getValueAt(row, column);
 				String nomeReg = (String) table.getModel().getValueAt(row, column-1);
-				p.regs.get(nomeReg).setValor(Integer.decode(novoValor));
+				p.regs.get(nomeReg).setValue(Integer.decode(novoValor));
 				
 			}
 		});
@@ -494,7 +494,7 @@ public class InterfaceGrafica {
 		editorSP.add(new RTextScrollPane(editor.get(editor.size()-1)));
 		editorTB.addTab(nomeTab, null, editorSP.get(editorSP.size()-1), null);
 		
-		CompletionProvider provider = new DefaultCompletionProvider(Constante.syntax);
+		CompletionProvider provider = new DefaultCompletionProvider(Constant.syntax);
 		AutoCompletion ac = new AutoCompletion(provider);
 		ac.install(editor.get(editor.size()-1));
 		
@@ -550,7 +550,7 @@ public class InterfaceGrafica {
 		String s2;
 		
 		if(reg.equals("pc")) s2 = Integer.toHexString(uc.pc);
-		else s2 = Integer.toHexString(p.getRegister().get(reg).getValor());
+		else s2 = Integer.toHexString(p.getRegister().get(reg).getValue());
 		
 		for(int i=0; i < 8 - s2.length(); i++){
 			s1 = s1.concat("0");

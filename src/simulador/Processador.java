@@ -4,44 +4,44 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Processador {
-	public Map<String, Registrador> regs = new TreeMap<String, Registrador>();
+	public Map<String, Register> regs = new TreeMap<String, Register>();
 	public Map<String, OperacaoMIPS> ops = new TreeMap<String, OperacaoMIPS>();	
 	
 	public Processador(){
-		regs.put("$zero", new Registrador("00000"));
-		regs.put("$at", new Registrador("00001"));
-		regs.put("$v0", new Registrador("00010"));
-		regs.put("$v1", new Registrador("00011"));
-		regs.put("$a0", new Registrador("00100"));
-		regs.put("$a1", new Registrador("00101"));
-		regs.put("$a2", new Registrador("00110"));
-		regs.put("$a3", new Registrador("00111"));
-		regs.put("$t0", new Registrador("01000"));
-		regs.put("$t1", new Registrador("01001"));
-		regs.put("$t2", new Registrador("01010"));
-		regs.put("$t3", new Registrador("01011"));
-		regs.put("$t4", new Registrador("01100"));
-		regs.put("$t5", new Registrador("01101"));
-		regs.put("$t6", new Registrador("01110"));
-		regs.put("$t7", new Registrador("01111"));
-		regs.put("$s0", new Registrador("10000"));
-		regs.put("$s1", new Registrador("10001"));
-		regs.put("$s2", new Registrador("10010"));
-		regs.put("$s3", new Registrador("10011"));
-		regs.put("$s4", new Registrador("10100"));
-		regs.put("$s5", new Registrador("10101"));
-		regs.put("$s6", new Registrador("10110"));
-		regs.put("$s7", new Registrador("10111"));
-		regs.put("$t8", new Registrador("11000"));
-		regs.put("$t9", new Registrador("11001"));
-		regs.put("$k0", new Registrador("11010"));
-		regs.put("$k1", new Registrador("11011"));
-		regs.put("$gp", new Registrador("11100"));
-		regs.put("$sp", new Registrador("11101"));
-		regs.put("$fp", new Registrador("11110"));
-		regs.put("$ra", new Registrador("11111"));
-		regs.put("hi", new Registrador(null));
-		regs.put("lo", new Registrador(null));
+		regs.put("$zero", new Register("00000"));
+		regs.put("$at", new Register("00001"));
+		regs.put("$v0", new Register("00010"));
+		regs.put("$v1", new Register("00011"));
+		regs.put("$a0", new Register("00100"));
+		regs.put("$a1", new Register("00101"));
+		regs.put("$a2", new Register("00110"));
+		regs.put("$a3", new Register("00111"));
+		regs.put("$t0", new Register("01000"));
+		regs.put("$t1", new Register("01001"));
+		regs.put("$t2", new Register("01010"));
+		regs.put("$t3", new Register("01011"));
+		regs.put("$t4", new Register("01100"));
+		regs.put("$t5", new Register("01101"));
+		regs.put("$t6", new Register("01110"));
+		regs.put("$t7", new Register("01111"));
+		regs.put("$s0", new Register("10000"));
+		regs.put("$s1", new Register("10001"));
+		regs.put("$s2", new Register("10010"));
+		regs.put("$s3", new Register("10011"));
+		regs.put("$s4", new Register("10100"));
+		regs.put("$s5", new Register("10101"));
+		regs.put("$s6", new Register("10110"));
+		regs.put("$s7", new Register("10111"));
+		regs.put("$t8", new Register("11000"));
+		regs.put("$t9", new Register("11001"));
+		regs.put("$k0", new Register("11010"));
+		regs.put("$k1", new Register("11011"));
+		regs.put("$gp", new Register("11100"));
+		regs.put("$sp", new Register("11101"));
+		regs.put("$fp", new Register("11110"));
+		regs.put("$ra", new Register("11111"));
+		regs.put("hi", new Register(null));
+		regs.put("lo", new Register(null));
 		
 		ops.put("add", new OperacaoMIPS("000000","100000"));
 		ops.put("addu", new OperacaoMIPS("000000","100001"));
@@ -82,12 +82,12 @@ public class Processador {
 		ops.put("j", new OperacaoMIPS("000010",null));
 		ops.put("jal", new OperacaoMIPS("000011",null));
 		
-		regs.get("$zero").setValor(0);
-		regs.get("$sp").setValor(4000);
+		regs.get("$zero").setValue(0);
+		regs.get("$sp").setValue(4000);
 	}
 	
 	public String getRegisterAdress(String str){
-		return regs.get(str).endereco;
+		return regs.get(str).address;
 	}
 	
 	public String getOpcode(String str){
@@ -98,11 +98,11 @@ public class Processador {
 		return ops.get(str).function;
 	}
 	
-	public Map<String,Registrador> getRegister(){
+	public Map<String, Register> getRegister(){
 		return regs;
 	}
 	
-	public Registrador getRegister(String str){
+	public Register getRegister(String str){
 		if(str.equals("00000")) return regs.get("$zero");
 		else if(str.equals("00001")) return regs.get("$at");
 		else if(str.equals("00010")) return regs.get("$v0");
@@ -140,8 +140,8 @@ public class Processador {
 	
 	public void resetRegisters(){
 		for (String reg : regs.keySet()) {
-			regs.get(reg).setValor(0);
+			regs.get(reg).setValue(0);
 		}
-		regs.get("$sp").setValor(4000);
+		regs.get("$sp").setValue(4000);
 	}
 }

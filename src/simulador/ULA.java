@@ -1,151 +1,188 @@
 package simulador;
 
 public class ULA {
-	public Memoria m;
-	public Constante c = new Constante();
-	public ULA(Memoria m){
-		this.m = m;
-	}
-	
-	public void add(Registrador rs, Registrador rt, Registrador rd) throws Overflow{		
-		rd.setValor(rs.getValor()+rt.getValor());
-		if((rs.getValor()>=0)&&(rt.getValor()>=0)&&(rd.getValor()<0)) throw new Overflow();
-		else if((rs.getValor()<0)&&(rt.getValor()<0)&&(rd.getValor()>=0)) throw new Overflow();
-	}
-	public void addu(Registrador rs, Registrador rt, Registrador rd){
-		rd.setValor(rs.getValor()+rt.getValor());
-	}
-	public void sub(Registrador rs, Registrador rt, Registrador rd) throws Overflow{
-		rd.setValor(rs.getValor()-rt.getValor());
-		if((rs.getValor()>=0)&&(rt.getValor()<0)&&(rd.getValor()<0)) throw new Overflow();
-		else if((rs.getValor()<0)&&(rt.getValor()>=0)&&(rd.getValor()>=0)) throw new Overflow();
-	}
-	public void subu(Registrador rs, Registrador rt, Registrador rd){
-		rd.setValor(rs.getValor()-rt.getValor());
-	}
-	public void addi(Registrador rs, Registrador rt, int imediato) throws Overflow{
-		rs.setValor(rt.getValor()+imediato);
-		if((imediato>=0)&&(rt.getValor()>=0)&&(rs.getValor()<0)) throw new Overflow();
-		else if((imediato<0)&&(rt.getValor()<0)&&(rs.getValor()>0)) throw new Overflow();
-	}
-	public void addiu(Registrador rs, Registrador rt, int imediato){
-		rs.setValor(rt.getValor()+imediato);
-	}
-	public void or(Registrador rs, Registrador rt, Registrador rd){
-		rd.setValor(rs.getValor()|rt.getValor());
-	}
-	public void and(Registrador rs, Registrador rt, Registrador rd){
-		rd.setValor(rs.getValor()&rt.getValor());
-	}
-	public void nor(Registrador rs, Registrador rt, Registrador rd){
-		rd.setValor(~(rs.getValor()|rt.getValor()));
-	}
-	public void ori(Registrador rs, Registrador rt, int imediato){
-		rs.setValor(rt.getValor()|imediato);
-	}
-	public void andi(Registrador rs, Registrador rt, int imediato){
-		rs.setValor(rt.getValor()&imediato);
-	}
-	public void mult(Registrador rs, Registrador rt, Registrador hi, Registrador lo){
-		Long integ = (long) (rs.getValor()*rt.getValor());
-		String i = c.toGreaterBinary(integ);
-		hi.setValor(c.toInteger(i.substring(0,32)));
-		lo.setValor(c.toInteger(i.substring(32)));
-	}
-	public void div(Registrador rs, Registrador rt, Registrador hi, Registrador lo){
-		hi.setValor(rs.getValor()%rt.getValor());
-		lo.setValor(rs.getValor()/rt.getValor());
-	}
-	public void mfhi(Registrador rd, Registrador hi){
-		rd.setValor(c.toInteger(hi.valor));
-	}
-	public void mflo(Registrador rd, Registrador lo){
-		rd.setValor(c.toInteger(lo.valor));
-	}
-	public void slt(Registrador rs, Registrador rt, Registrador rd){
-		if(rs.getValor()<rt.getValor()) rd.setValor(1);
-		else rd.setValor(0);
-	}
-	public void sltu(Registrador rs, Registrador rt, Registrador rd){
-		if(rs.getUnsignedValue()<rt.getUnsignedValue()) rd.setValor(1);
-		else rd.setValor(0);
-	}
-	public void slti(Registrador rs, Registrador rt, int valor){
-		if(rt.getValor()<valor) rs.setValor(1);
-		else rs.setValor(0);
-	}
-	public void sltiu(Registrador rs, Registrador rt, int valor){
-		if(rt.getUnsignedValue()<c.toUnsignedInteger(Integer.toBinaryString(valor))) rs.setValor(1);
-		else rs.setValor(0);
-	}
-	public void srl(Registrador rt, Registrador rd, int shamt){
-		rd.setValor(rt.getValor()>>shamt);
-	}
-	public void sll(Registrador rt, Registrador rd, int shamt){
-		rd.setValor(rt.getValor()<<shamt);
-	}
-	
-	public void lb(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		rt.setValor(c.toInteger(m.getInstrucao(pos).substring(24)));
-	}
-	public void lbu(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		rt.setValor(Integer.parseInt(m.getInstrucao(pos).substring(24),2));
-	}
-	public void sb(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		int aux = Integer.parseInt(rt.valor.substring(24), 2);
-		m.setValor(pos, aux);
-	}	
-	public void lh(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		rt.setValor(c.toInteger(m.getInstrucao(pos).substring(16)));
-	}
-	public void lhu(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		rt.setValor(Integer.parseInt(m.getInstrucao(pos).substring(16),2));
-	}
-	public void sh(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		int aux = Integer.parseInt(rt.valor.substring(16), 2);
-		m.setValor(pos, aux);
-	}
-	public void lw(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		int pos;
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		pos = rs.getValor()+valor;
-		rt.setValor(m.getValor(pos));
-	}
-	public void sw(Registrador rs, Registrador rt, int valor) throws ErroAcesso{
-		if((valor%4!=0)||(rs.getValor()%4!=0)) throw new ErroAcesso();
-		int pos = rs.getValor()+valor;
-		m.setValor(pos, rt.getValor());
-	}
-	public void lui(Registrador rt, int imed){
-		imed = imed<<16;
-		rt.valor = c.toBinary(imed);
-	}
-	public boolean beq(Registrador rs, Registrador rt){
-		if(rs.getValor()==rt.getValor()) return true;
-		return false;
-	}
-	public boolean bne(Registrador rs, Registrador rt){
-		if(rs.getValor()!=rt.getValor()) return true;
-		return false;
-	}
-	public boolean blez(Registrador rs){
-		if(rs.getValor()<=0) return true;
-		return false;
-	}
-	public boolean bgtz(Registrador rs){
-		if(rs.getValor()>0) return true;
-		return false;
-	}
+    public Memory m;
+
+    public ULA(Memory m) {
+        this.m = m;
+    }
+
+    public void add(Register rs, Register rt, Register rd) throws OverflowException {
+        rd.setValue(rs.getValue() + rt.getValue());
+
+        if ((rs.getValue() >= 0) && (rt.getValue() >= 0) && (rd.getValue() < 0))
+            throw new OverflowException();
+        else if ((rs.getValue() < 0) && (rt.getValue() < 0) && (rd.getValue() >= 0))
+            throw new OverflowException();
+    }
+
+    public void addu(Register rs, Register rt, Register rd) {
+        rd.setValue(rs.getValue() + rt.getValue());
+    }
+
+    public void sub(Register rs, Register rt, Register rd) throws OverflowException {
+        rd.setValue(rs.getValue() - rt.getValue());
+
+        if ((rs.getValue() >= 0) && (rt.getValue() < 0) && (rd.getValue() < 0))
+            throw new OverflowException();
+        else if ((rs.getValue() < 0) && (rt.getValue() >= 0) && (rd.getValue() >= 0))
+            throw new OverflowException();
+    }
+
+    public void subu(Register rs, Register rt, Register rd) {
+        rd.setValue(rs.getValue() - rt.getValue());
+    }
+
+    public void addi(Register rs, Register rt, int immediate) throws OverflowException {
+        rs.setValue(rt.getValue() + immediate);
+
+        if ((immediate >= 0) && (rt.getValue() >= 0) && (rs.getValue() < 0))
+            throw new OverflowException();
+        else if ((immediate < 0) && (rt.getValue() < 0) && (rs.getValue() > 0))
+            throw new OverflowException();
+    }
+
+    public void addiu(Register rs, Register rt, int immediate) {
+        rs.setValue(rt.getValue() + immediate);
+    }
+
+    public void or(Register rs, Register rt, Register rd) {
+        rd.setValue(rs.getValue() | rt.getValue());
+    }
+
+    public void and(Register rs, Register rt, Register rd) {
+        rd.setValue(rs.getValue() & rt.getValue());
+    }
+
+    public void nor(Register rs, Register rt, Register rd) {
+        rd.setValue(~(rs.getValue() | rt.getValue()));
+    }
+
+    public void ori(Register rs, Register rt, int immediate) {
+        rs.setValue(rt.getValue() | immediate);
+    }
+
+    public void andi(Register rs, Register rt, int immediate) {
+        rs.setValue(rt.getValue() & immediate);
+    }
+
+    public void mult(Register rs, Register rt, Register hi, Register lo) {
+        Long integ = (long) (rs.getValue() * rt.getValue());
+        String i = Constant.toGreaterBinary(integ);
+        hi.setValue(Constant.toInteger(i.substring(0, 32)));
+        lo.setValue(Constant.toInteger(i.substring(32)));
+    }
+
+    public void div(Register rs, Register rt, Register hi, Register lo) {
+        hi.setValue(rs.getValue() % rt.getValue());
+        lo.setValue(rs.getValue() / rt.getValue());
+    }
+
+    public void mfhi(Register rd, Register hi) {
+        rd.setValue(Constant.toInteger(hi.value));
+    }
+
+    public void mflo(Register rd, Register lo) {
+        rd.setValue(Constant.toInteger(lo.value));
+    }
+
+    public void slt(Register rs, Register rt, Register rd) {
+        if (rs.getValue() < rt.getValue()) rd.setValue(1);
+        else rd.setValue(0);
+    }
+
+    public void sltu(Register rs, Register rt, Register rd) {
+        if (rs.getUnsignedValue() < rt.getUnsignedValue()) rd.setValue(1);
+        else rd.setValue(0);
+    }
+
+    public void slti(Register rs, Register rt, int valor) {
+        if (rt.getValue() < valor) rs.setValue(1);
+        else rs.setValue(0);
+    }
+
+    public void sltiu(Register rs, Register rt, int valor) {
+        if (rt.getUnsignedValue() < Constant.toUnsignedInteger(Integer.toBinaryString(valor))) rs.setValue(1);
+        else rs.setValue(0);
+    }
+
+    public void srl(Register rt, Register rd, int shamt) {
+        rd.setValue(rt.getValue() >> shamt);
+    }
+
+    public void sll(Register rt, Register rd, int shamt) {
+        rd.setValue(rt.getValue() << shamt);
+    }
+
+    public void lb(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        rt.setValue(Constant.toInteger(m.getWord(pos).substring(24)));
+    }
+
+    public void lbu(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        rt.setValue(Integer.parseInt(m.getWord(pos).substring(24), 2));
+    }
+
+    public void sb(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        int aux = Integer.parseInt(rt.value.substring(24), 2);
+        m.setValue(pos, aux);
+    }
+
+    public void lh(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        rt.setValue(Constant.toInteger(m.getWord(pos).substring(16)));
+    }
+
+    public void lhu(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        rt.setValue(Integer.parseInt(m.getWord(pos).substring(16), 2));
+    }
+
+    public void sh(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        int aux = Integer.parseInt(rt.value.substring(16), 2);
+        m.setValue(pos, aux);
+    }
+
+    public void lw(Register rs, Register rt, int valor) throws ErroAcesso {
+        int pos;
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        pos = rs.getValue() + valor;
+        rt.setValue(m.getValue(pos));
+    }
+
+    public void sw(Register rs, Register rt, int valor) throws ErroAcesso {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        int pos = rs.getValue() + valor;
+        m.setValue(pos, rt.getValue());
+    }
+
+    public void lui(Register rt, int immediate) {
+        immediate = immediate << 16;
+        rt.value = Constant.toBinary(immediate);
+    }
+
+    public boolean beq(Register rs, Register rt) {
+        return rs.getValue() == rt.getValue();
+    }
+
+    public boolean bne(Register rs, Register rt) {
+        return rs.getValue() != rt.getValue();
+    }
+
+    public boolean blez(Register rs) {
+        return rs.getValue() <= 0;
+    }
+
+    public boolean bgtz(Register rs) {
+        return rs.getValue() > 0;
+    }
 }

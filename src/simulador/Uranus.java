@@ -1,11 +1,11 @@
 package simulador;
 
-import gui.InterfaceGrafica;
+import gui.UI;
 
 public class Uranus {
-	public static InterfaceGrafica ig; // static = todos podem acessar
+	public static UI ui;
 	
-	public Uranus(Processador p, Memoria m, Assembler mont, UC uc) {
-		Uranus.ig = new InterfaceGrafica(p, m, mont, uc);
+	public Uranus(Processador p, Memory m, Assembler mont, UC uc) {
+		Uranus.ui = new UI(p, m, mont, uc);
 	}
 }
