@@ -1,4 +1,4 @@
-package simulador;
+package simulator.exceptions;
 
 // TODO: Make all uses of this exception use the Java's IntegerOutOfRangeException
 

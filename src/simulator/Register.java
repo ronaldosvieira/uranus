@@ -1,4 +1,4 @@
-package simulador;
+package simulator;
 
 public class Register {
     public String address;

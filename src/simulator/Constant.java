@@ -1,4 +1,4 @@
-package simulador;
+package simulator;
 
 public class Constant {
     public static final String[] syntax = {"add", "addi", "addiu", "addu", "and", "andi", "bgt", "blt", "bge", "ble", "bgtu", "bgtz", "beq", "bne", "div", "divu", "j", "jal", "jr", "la", "lb", "lbu", "lh", "lhu", "li", "lui", "lw", "lwcZ", "mfhi", "mflo", "mthi", "mtlo", "mfc0", "mfcZ", "mtcZ", "mult", "multu", "nor", "xor", "or", "ori", "sb", "sh", "slt", "slti", "sltiu", "sltu", "sll", "srl", "sra", "sub", "subu", "sb", "sw", "swcZ", "sh", "syscall"};

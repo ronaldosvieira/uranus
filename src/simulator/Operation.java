@@ -1,10 +1,10 @@
-package simulador;
+package simulator;
 
-public class OperacaoMIPS {
+public class Operation {
 	public String opcode;
 	public String function;
 	
-	public OperacaoMIPS(String opcode,String function){
+	public Operation(String opcode, String function){
 		this.opcode = opcode;
 		this.function = function;
 	}

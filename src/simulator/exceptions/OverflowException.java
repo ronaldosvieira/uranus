@@ -1,4 +1,6 @@
-package simulador;
+package simulator.exceptions;
+
+import simulator.Uranus;
 
 public class OverflowException extends Exception {
 

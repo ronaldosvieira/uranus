@@ -47,16 +47,19 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
-import simulador.Assembler;
-import simulador.Constant;
-import simulador.ErroAcesso;
-import simulador.IntegerOutofRangeException;
-import simulador.Memory;
-import simulador.OverflowException;
-import simulador.Processador;
-import simulador.UC;
+import simulator.Parser;
+import simulator.Constant;
+import simulator.exceptions.AccessErrorException;
+import simulator.exceptions.IntegerOutofRangeException;
+import simulator.Memory;
+import simulator.exceptions.OverflowException;
+import simulator.Processor;
+import simulator.CU;
 
 public class UI {
+
+	private static String programName = "Uranus";
+	private static String programVersion = "1.0";
 
 	private JFrame frmUranus;
 	private JTable table;
@@ -67,19 +70,19 @@ public class UI {
 	
 	private JButton btnNovo,btnAbrir,btnSalvar,btnFechar,btnConstruir,btnExecutar,btnExecutarPasso,btnResetar;
 	
-	private Processador p;
+	private Processor p;
 	private Memory m;
-	private Assembler mont;
-	private UC uc;
+	private Parser mont;
+	private CU cu;
 
 	/**
 	 * Create the application.
 	 */
-	public UI(Processador p, Memory m, Assembler mont, UC uc){
+	public UI(Processor p, Memory m, Parser mont, CU cu){
 		this.p = p;
 		this.m = m;
 		this.mont = mont;
-		this.uc = uc;
+		this.cu = cu;
 		initialize();
 		this.getFrmUranus().setVisible(true);
 	}
@@ -89,7 +92,7 @@ public class UI {
 	 */
 	private void initialize() {
 		setFrmUranus(new JFrame());
-		getFrmUranus().setTitle("URANUS 1.0");
+		getFrmUranus().setTitle(programName + " " + programVersion);
 		getFrmUranus().setBounds(100, 100, 800, 600);
 		getFrmUranus().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -285,13 +288,13 @@ public class UI {
 		btnExecutar.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				while(uc.pc/4 <= m.size() && m.getWord(uc.pc)!=null){
+				while(cu.pc/4 <= m.size() && m.getWord(cu.pc)!=null){
 					int start,end;
 					
 					try {
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
-						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(uc.pc/4);
-						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(uc.pc/4);
+						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(cu.pc/4);
+						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(cu.pc/4);
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().addHighlight(start, end, new DefaultHighlighter.DefaultHighlightPainter(Color.green));
 						
 					} catch (BadLocationException e1) {
@@ -299,8 +302,8 @@ public class UI {
 					}
 					
 					try {
-						if(!(uc.getInstruction())) break;
-					} catch (ErroAcesso | IntegerOutofRangeException | OverflowException e2) {
+						if(!(cu.getInstruction())) break;
+					} catch (AccessErrorException | IntegerOutofRangeException | OverflowException e2) {
 						writeError(e2.getMessage());
 					}
 					
@@ -316,19 +319,19 @@ public class UI {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				int start,end;
-				if(uc.pc/4 <= m.size() && m.getWord(uc.pc)!=null){
+				if(cu.pc/4 <= m.size() && m.getWord(cu.pc)!=null){
 					try {
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
-						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(uc.pc/4);
-						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(uc.pc/4);
+						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(cu.pc/4);
+						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(cu.pc/4);
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().addHighlight(start, end, new DefaultHighlighter.DefaultHighlightPainter(Color.green));
 					} catch (BadLocationException e1) {
 						writeError("Erro: "+e1.getMessage());
 					}
 					
 					try {
-						uc.getInstruction();
-					} catch (ErroAcesso | IntegerOutofRangeException e) {
+						cu.getInstruction();
+					} catch (AccessErrorException | IntegerOutofRangeException e) {
 						writeError("Erro: "+e.getMessage());
 					} catch (OverflowException e) {
 						writeError("Erro: "+e.getMessage());
@@ -347,9 +350,9 @@ public class UI {
 			public void mouseClicked(MouseEvent e) {
 				m.clear();
 				p.resetRegisters();
-				uc.pc = 0;
+				cu.pc = 0;
 				mont.instrucoes.clear();
-				uc.list.clear();
+				cu.list.clear();
 				refreshTable();
 				console.setText("");
 				
@@ -549,7 +552,7 @@ public class UI {
 		String s1 = "0x";
 		String s2;
 		
-		if(reg.equals("pc")) s2 = Integer.toHexString(uc.pc);
+		if(reg.equals("pc")) s2 = Integer.toHexString(cu.pc);
 		else s2 = Integer.toHexString(p.getRegister().get(reg).getValue());
 		
 		for(int i=0; i < 8 - s2.length(); i++){

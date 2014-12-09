@@ -1,10 +1,13 @@
-package simulador;
+package simulator;
 
-public class ULA {
-    public Memory m;
+import simulator.exceptions.AccessErrorException;
+import simulator.exceptions.OverflowException;
 
-    public ULA(Memory m) {
-        this.m = m;
+public class ALU {
+    public Memory mem;
+
+    public ALU() {
+        this.mem = Memory.getInstance();
     }
 
     public void add(Register rs, Register rt, Register rd) throws OverflowException {
@@ -114,55 +117,55 @@ public class ULA {
         rd.setValue(rt.getValue() << shamt);
     }
 
-    public void lb(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void lb(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
-        rt.setValue(Constant.toInteger(m.getWord(pos).substring(24)));
+        rt.setValue(Constant.toInteger(mem.getWord(pos).substring(24)));
     }
 
-    public void lbu(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void lbu(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
-        rt.setValue(Integer.parseInt(m.getWord(pos).substring(24), 2));
+        rt.setValue(Integer.parseInt(mem.getWord(pos).substring(24), 2));
     }
 
-    public void sb(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void sb(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
         int aux = Integer.parseInt(rt.value.substring(24), 2);
-        m.setValue(pos, aux);
+        mem.setValue(pos, aux);
     }
 
-    public void lh(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void lh(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
-        rt.setValue(Constant.toInteger(m.getWord(pos).substring(16)));
+        rt.setValue(Constant.toInteger(mem.getWord(pos).substring(16)));
     }
 
-    public void lhu(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void lhu(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
-        rt.setValue(Integer.parseInt(m.getWord(pos).substring(16), 2));
+        rt.setValue(Integer.parseInt(mem.getWord(pos).substring(16), 2));
     }
 
-    public void sh(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void sh(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
         int aux = Integer.parseInt(rt.value.substring(16), 2);
-        m.setValue(pos, aux);
+        mem.setValue(pos, aux);
     }
 
-    public void lw(Register rs, Register rt, int valor) throws ErroAcesso {
+    public void lw(Register rs, Register rt, int valor) throws AccessErrorException {
         int pos;
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         pos = rs.getValue() + valor;
-        rt.setValue(m.getValue(pos));
+        rt.setValue(mem.getValue(pos));
     }
 
-    public void sw(Register rs, Register rt, int valor) throws ErroAcesso {
-        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new ErroAcesso();
+    public void sw(Register rs, Register rt, int valor) throws AccessErrorException {
+        if ((valor % 4 != 0) || (rs.getValue() % 4 != 0)) throw new AccessErrorException();
         int pos = rs.getValue() + valor;
-        m.setValue(pos, rt.getValue());
+        mem.setValue(pos, rt.getValue());
     }
 
     public void lui(Register rt, int immediate) {

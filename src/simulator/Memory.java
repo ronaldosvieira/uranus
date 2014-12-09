@@ -1,17 +1,24 @@
-package simulador;
+package simulator;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 public class Memory {
-    public Map<Integer, String> m;
+    private Map<Integer, String> m;
 
+    private static Memory instance = null;
     private static int SIZE_MEM_BYTES = 4000;
 
-    public Memory() {
+    private Memory() {
         m = new TreeMap<>();
 
         for (int i = 0; i < SIZE_MEM_BYTES; i = i + 4) m.put(i, null);
+    }
+
+    public static Memory getInstance() {
+        if (instance == null) instance = new Memory();
+
+        return instance;
     }
 
     public void setWord(String f, int index) {
@@ -38,7 +45,7 @@ public class Memory {
     }
 
     public int getValue(int index) {
-        //return Integer.parseInt(m.get(index),2);
+        //return Integer.parseInt(mem.get(index),2);
         return Constant.toInteger(m.get(index));
     }
 

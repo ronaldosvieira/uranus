@@ -1,15 +1,15 @@
-package simulador;
+package simulator;
+
+import simulator.exceptions.IntegerOutofRangeException;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-public class Assembler {
-    //public static Map<String, OperacaoMIPS> op;
-    //public static Map<String, Register> regs;
+public class Parser {
     public ArrayList<String> instrucoes = new ArrayList<>();
 
     private Memory m;
-    private Processador p;
+    private Processor p;
 
     private String label = "\\s*\\D\\w+:\\s*";
     private String r = "\\s*(addu|add|subu|sub|and|or|nor|sltu|slt)";
@@ -47,8 +47,8 @@ public class Assembler {
     //Este regex � especial para identificar labels que ocorrem na mesma linha que uma instru��o
     String label_com_instrucao = label + "\\s*\\D\\w+\\s*";
 
-    public Assembler(Memory m, Processador p) {
-        this.m = m;
+    public Parser(Processor p) {
+        this.m = Memory.getInstance();
         this.p = p;
     }
 
@@ -104,7 +104,7 @@ public class Assembler {
                         instrucoes.add(str03);
                     } else instrucoes.add(list.get(i));
                 }
-                //As instru��es andi e ori tamb�m necessitam de um tratamento especial
+                //As instru��es andi e ori tamb�mem necessitam de um tratamento especial
                 //no caso de o imediato ser negativo ou maior do que 2e16-1
                 else if (array.get(0).equals("andi")) {
                     if (imediato < 0 || imediato > 65535) {
