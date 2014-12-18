@@ -6,7 +6,7 @@ import simulator.exceptions.OverflowException;
 
 import java.util.ArrayList;
 
-public class CU {
+public class ControlUnit {
 	
 	public ALU ALU;
 	public Memory m;
@@ -15,7 +15,7 @@ public class CU {
 	public int pc;
 	public String currentLine;
 	
-	public CU(Processor p, ALU u, Parser a){
+	public ControlUnit(Processor p, ALU u, Parser a){
 		this.m = Memory.getInstance();
 		this.p = p;
 		this.ALU = u;

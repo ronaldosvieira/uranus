@@ -54,7 +54,7 @@ import simulator.exceptions.IntegerOutofRangeException;
 import simulator.Memory;
 import simulator.exceptions.OverflowException;
 import simulator.Processor;
-import simulator.CU;
+import simulator.ControlUnit;
 
 public class UI {
 
@@ -68,21 +68,21 @@ public class UI {
 	private ArrayList<RTextScrollPane> editorSP;
 	private JTabbedPane editorTB;
 	
-	private JButton btnNovo,btnAbrir,btnSalvar,btnFechar,btnConstruir,btnExecutar,btnExecutarPasso,btnResetar;
+	private JButton btnNew, btnOpen, btnSave, btnClose, btnBuild, btnExecute, btnExecuteStep, btnReset;
 	
 	private Processor p;
 	private Memory m;
 	private Parser mont;
-	private CU cu;
+	private ControlUnit controlUnit;
 
 	/**
 	 * Create the application.
 	 */
-	public UI(Processor p, Memory m, Parser mont, CU cu){
+	public UI(Processor p, Memory m, Parser mont, ControlUnit controlUnit){
 		this.p = p;
 		this.m = m;
 		this.mont = mont;
-		this.cu = cu;
+		this.controlUnit = controlUnit;
 		initialize();
 		this.getFrmUranus().setVisible(true);
 	}
@@ -122,89 +122,89 @@ public class UI {
 					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
 		);
 		
-		JButton btnNovo = new JButton("Novo");
+		JButton btnNovo = new JButton("New");
 		btnNovo.setIcon(new ImageIcon(getClass().getResource("/img/novo.png")));
 		toolBar.add(btnNovo);
 		btnNovo.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				addNewEditorTab("Sem T�tulo");
+				addNewEditorTab("Untitled");
 			}
 		});
 		
-		btnAbrir = new JButton("Abrir");
-		btnAbrir.setIcon(new ImageIcon(getClass().getResource("/img/abrir.png")));
-		toolBar.add(btnAbrir);
-		btnAbrir.addMouseListener(new MouseAdapter(){
+		btnOpen = new JButton("Open");
+		btnOpen.setIcon(new ImageIcon(getClass().getResource("/img/abrir.png")));
+		toolBar.add(btnOpen);
+		btnOpen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFileChooser janelaAbrir = new JFileChooser();
-				
-				int returnVal = janelaAbrir.showOpenDialog(janelaAbrir);
-				if(returnVal == JFileChooser.APPROVE_OPTION){
-					File arquivo = new File(janelaAbrir.getSelectedFile().getAbsolutePath());
-					String nomeArquivo = janelaAbrir.getSelectedFile().getName();
-					
-					if(arquivo.exists()){
+				JFileChooser openWindow = new JFileChooser();
+
+				int returnVal = openWindow.showOpenDialog(openWindow);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file = new File(openWindow.getSelectedFile().getAbsolutePath());
+					String fileName = openWindow.getSelectedFile().getName();
+
+					if (file.exists()) {
 						FileReader fr;
 						BufferedReader br;
 						try {
-							fr = new FileReader(arquivo);
+							fr = new FileReader(file);
 							br = new BufferedReader(fr);
-							
-							addNewEditorTab(nomeArquivo);
-							
-							while(br.ready()){
-								editor.get(editorTB.getSelectedIndex()).setText((editor.get(editorTB.getSelectedIndex()).getText()+br.readLine()+"\n"));
+
+							addNewEditorTab(fileName);
+
+							while (br.ready()) {
+								editor.get(editorTB.getSelectedIndex()).setText((editor.get(editorTB.getSelectedIndex()).getText() + br.readLine() + "\n"));
 							}
-							
+
 							br.close();
 							fr.close();
-							
+
 						} catch (FileNotFoundException e1) {
 							e1.printStackTrace();
 						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
-						
-						
-					}else{
-						
+
+
+					} else {
+
 					}
 				}
-				
+
 			}
 		});
 		
-		btnSalvar = new JButton("Salvar");
-		btnSalvar.setIcon(new ImageIcon(getClass().getResource("/img/salvar.png")));
-		toolBar.add(btnSalvar);
-		btnSalvar.addMouseListener(new MouseAdapter(){
+		btnSave = new JButton("Save");
+		btnSave.setIcon(new ImageIcon(getClass().getResource("/img/salvar.png")));
+		toolBar.add(btnSave);
+		btnSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JFileChooser janelaSalvar = new JFileChooser();
-				
-				janelaSalvar.setSelectedFile(new File("mips1.asm"));
-				int returnVal = janelaSalvar.showSaveDialog(janelaSalvar);
-			    if(returnVal == JFileChooser.APPROVE_OPTION) {
-				   File novoArquivo = new File(janelaSalvar.getSelectedFile().getAbsolutePath());
-				   String nomeNovoArquivo = janelaSalvar.getSelectedFile().getName();
-				   
-				   if(novoArquivo.exists()) novoArquivo.delete();
-				   
-				   try {
-					   novoArquivo.createNewFile();
-				   } catch (IOException e1) {
-					   e1.printStackTrace();
-				   }
-				   
-				   	FileWriter fw;
-				   	BufferedWriter bw;
-				   	
-				   	editorTB.setTitleAt(editorTB.getSelectedIndex(), nomeNovoArquivo);
-				   	
+				JFileChooser saveWindow = new JFileChooser();
+
+				saveWindow.setSelectedFile(new File("mips1.asm"));
+				int returnVal = saveWindow.showSaveDialog(saveWindow);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file = new File(saveWindow.getSelectedFile().getAbsolutePath());
+					String fileName = saveWindow.getSelectedFile().getName();
+
+					if (file.exists()) file.delete();
+
 					try {
-						fw = new FileWriter(novoArquivo);
+						file.createNewFile();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					FileWriter fw;
+					BufferedWriter bw;
+
+					editorTB.setTitleAt(editorTB.getSelectedIndex(), fileName);
+
+					try {
+						fw = new FileWriter(file);
 						bw = new BufferedWriter(fw);
 						bw.write(editor.get(editorTB.getSelectedIndex()).getText());
 						bw.close();
@@ -212,17 +212,17 @@ public class UI {
 					} catch (IOException e1) {
 						writeError(e1.getMessage());
 					}
-			    }
+				}
 			}
 		});
 		
-		btnFechar = new JButton("Fechar");
-		btnFechar.setIcon(new ImageIcon(getClass().getResource("/img/fechar.png")));
-		toolBar.add(btnFechar);
-		btnFechar.addMouseListener(new MouseAdapter(){
+		btnClose = new JButton("Close");
+		btnClose.setIcon(new ImageIcon(getClass().getResource("/img/fechar.png")));
+		toolBar.add(btnClose);
+		btnClose.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(editorTB.getComponentCount() > 0){
+				if (editorTB.getComponentCount() > 0) {
 					int indexEditor = editorTB.getSelectedIndex();
 					editorTB.remove(indexEditor);
 					editorSP.remove(indexEditor);
@@ -231,142 +231,142 @@ public class UI {
 			}
 		});
 		
-		btnConstruir = new JButton("Construir");
-		btnConstruir.setIcon(new ImageIcon(getClass().getResource("/img/construir.png")));
-		toolBar.add(btnConstruir);
-		btnConstruir.addMouseListener(new MouseAdapter(){
+		btnBuild = new JButton("Build");
+		btnBuild.setIcon(new ImageIcon(getClass().getResource("/img/construir.png")));
+		toolBar.add(btnBuild);
+		btnBuild.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				ArrayList<String> a = new ArrayList<String>();
-				
+
 				m.clear();
 				p.resetRegisters();
 				refreshTable();
-				
-				if(editorTB.getComponentCount() > 0){
+
+				if (editorTB.getComponentCount() > 0) {
 					getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
-					
-					String[] texto = editor.get(editorTB.getSelectedIndex()).getText().split("\n");
-					for(int i=0; i<texto.length;i++) {
-						if(!(texto[i].isEmpty())) a.add(texto[i]);
+
+					String[] text = editor.get(editorTB.getSelectedIndex()).getText().split("\n");
+					for (int i = 0; i < text.length; i++) {
+						if (!(text[i].isEmpty())) a.add(text[i]);
 					}
 					try {
 						console.setText("");
 						mont.setNewList(a);
-						boolean construiu = mont.setInstrucao();
+						boolean isBuilt = mont.setInstrucao();
 						mont.retirarLabels();
-						if(construiu){
-							addNewRunTab(editorTB.getTitleAt(editorTB.getSelectedIndex())+" (construido)");
-							String construido = "";
-							for(int i = 0; i < mont.instrucoes.size(); i++){
-								construido += mont.instrucoes.get(i);
-								if(i != mont.instrucoes.size()-1){
-									construido += "\n";
+						if (isBuilt) {
+							addNewRunTab(editorTB.getTitleAt(editorTB.getSelectedIndex()) + " (build)");
+							String built = "";
+							for (int i = 0; i < mont.instrucoes.size(); i++) {
+								built += mont.instrucoes.get(i);
+								if (i != mont.instrucoes.size() - 1) {
+									built += "\n";
 								}
 							}
-							editor.get(editor.size()-1).setText(construido);
-							
-							
-							writeln("Constru�do.");
-						}else{
-							writeError("N�o constru�do.");
+							editor.get(editor.size() - 1).setText(built);
+
+
+							writeln("Built.");
+						} else {
+							writeError("Couldn't build.");
 						}
 					} catch (IntegerOutofRangeException e) {
-						writeError("Erro: "+e.getMessage());
-						writeError("N�o constru�do.");
+						writeError("Error: " + e.getMessage());
+						writeError("Couldn't build.");
 					}
-					
-					
+
+
 				}
-				
+
 			}
 		});
 		
-		btnExecutar = new JButton("Executar");
-		btnExecutar.setIcon(new ImageIcon(getClass().getResource("/img/executar.png")));
-		toolBar.add(btnExecutar);
-		btnExecutar.addMouseListener(new MouseAdapter(){
+		btnExecute = new JButton("Execute");
+		btnExecute.setIcon(new ImageIcon(getClass().getResource("/img/executar.png")));
+		toolBar.add(btnExecute);
+		btnExecute.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				while(cu.pc/4 <= m.size() && m.getWord(cu.pc)!=null){
-					int start,end;
-					
+				while (controlUnit.pc / 4 <= m.size() && m.getWord(controlUnit.pc) != null) {
+					int start, end;
+
 					try {
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
-						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(cu.pc/4);
-						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(cu.pc/4);
+						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(controlUnit.pc / 4);
+						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(controlUnit.pc / 4);
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().addHighlight(start, end, new DefaultHighlighter.DefaultHighlightPainter(Color.green));
-						
+
 					} catch (BadLocationException e1) {
-						writeError("Erro: "+e1.getMessage());
+						writeError("Error: " + e1.getMessage());
 					}
-					
+
 					try {
-						if(!(cu.getInstruction())) break;
+						if (!(controlUnit.getInstruction())) break;
 					} catch (AccessErrorException | IntegerOutofRangeException | OverflowException e2) {
 						writeError(e2.getMessage());
 					}
-					
+
 					refreshTable();
 				}
 			}
 		});
 		
-		btnExecutarPasso = new JButton("Executar Passo");
-		btnExecutarPasso.setIcon(new ImageIcon(getClass().getResource("/img/executar_passo.png")));
-		toolBar.add(btnExecutarPasso);
-		btnExecutarPasso.addMouseListener(new MouseAdapter() {
+		btnExecuteStep = new JButton("Execute Step");
+		btnExecuteStep.setIcon(new ImageIcon(getClass().getResource("/img/executar_passo.png")));
+		toolBar.add(btnExecuteStep);
+		btnExecuteStep.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				int start,end;
-				if(cu.pc/4 <= m.size() && m.getWord(cu.pc)!=null){
+				int start, end;
+				if (controlUnit.pc / 4 <= m.size() && m.getWord(controlUnit.pc) != null) {
 					try {
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
-						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(cu.pc/4);
-						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(cu.pc/4);
+						start = getEditor().get(editorTB.getSelectedIndex()).getLineStartOffset(controlUnit.pc / 4);
+						end = getEditor().get(editorTB.getSelectedIndex()).getLineEndOffset(controlUnit.pc / 4);
 						getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().addHighlight(start, end, new DefaultHighlighter.DefaultHighlightPainter(Color.green));
 					} catch (BadLocationException e1) {
-						writeError("Erro: "+e1.getMessage());
+						writeError("Error: " + e1.getMessage());
 					}
-					
+
 					try {
-						cu.getInstruction();
+						controlUnit.getInstruction();
 					} catch (AccessErrorException | IntegerOutofRangeException e) {
-						writeError("Erro: "+e.getMessage());
+						writeError("Error: " + e.getMessage());
 					} catch (OverflowException e) {
-						writeError("Erro: "+e.getMessage());
+						writeError("Error: " + e.getMessage());
 					}
-					
+
 					refreshTable();
 				}
 			}
 		});
 		
-		btnResetar = new JButton("Resetar");
-		btnResetar.setIcon(new ImageIcon(getClass().getResource("/img/resetar.png")));
-		toolBar.add(btnResetar);
-		btnResetar.addMouseListener(new MouseAdapter(){
+		btnReset = new JButton("Reset");
+		btnReset.setIcon(new ImageIcon(getClass().getResource("/img/resetar.png")));
+		toolBar.add(btnReset);
+		btnReset.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				m.clear();
 				p.resetRegisters();
-				cu.pc = 0;
+				controlUnit.pc = 0;
 				mont.instrucoes.clear();
-				cu.list.clear();
+				controlUnit.list.clear();
 				refreshTable();
 				console.setText("");
-				
-				if(editorTB.getComponentCount() > 0){
-					getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();					
-					for(int i = 0; i < editorTB.getTabCount(); i++){
-						if((editorTB.getTitleAt(i)).contains("(")){
+
+				if (editorTB.getComponentCount() > 0) {
+					getEditor().get(getEditorTB().getSelectedIndex()).getHighlighter().removeAllHighlights();
+					for (int i = 0; i < editorTB.getTabCount(); i++) {
+						if ((editorTB.getTitleAt(i)).contains("(")) {
 							editorTB.remove(i);
 							editorSP.remove(i);
 							editor.remove(i);
 						}
 					}
 				}
-				
+
 			}
 		});
 		
@@ -394,7 +394,7 @@ public class UI {
 		JTableHeader tableHeader = table.getTableHeader();
 		JPanel tableContainer = new JPanel();
 		tableContainer.setLayout(new BorderLayout());
-		tabbedPane_1.addTab("Registradores", null, tableContainer, null);
+		tabbedPane_1.addTab("Registers", null, tableContainer, null);
 		tableContainer.add(tableHeader,BorderLayout.NORTH);
 		tableContainer.add(table,BorderLayout.CENTER);
 		
@@ -413,7 +413,7 @@ public class UI {
 		scrollPane_console.setViewportView(tabbedPane_2);
 		
 		frmUranus.getContentPane().setLayout(groupLayout);
-		frmUranus.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{toolBar, btnNovo, btnAbrir, btnSalvar, btnConstruir, btnExecutar, btnExecutarPasso, btnResetar, splitPane, splitPane_1, console, tabbedPane_2}));
+		frmUranus.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{toolBar, btnNovo, btnOpen, btnSave, btnBuild, btnExecute, btnExecuteStep, btnReset, splitPane, splitPane_1, console, tabbedPane_2}));
 	}
 
 	public void refreshTable() {
@@ -456,13 +456,10 @@ public class UI {
 				{"lo", getHexRegValue("lo")},
 			},
 			new String[] {
-				"Nome", "Valor"
+				"Name", "Value"
 			}
 		
 		){
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -477,9 +474,9 @@ public class UI {
 			public void tableChanged(TableModelEvent e) {
 				int row = e.getFirstRow();
 				int column = e.getColumn();
-				String novoValor = (String) table.getModel().getValueAt(row, column);
-				String nomeReg = (String) table.getModel().getValueAt(row, column-1);
-				p.regs.get(nomeReg).setValue(Integer.decode(novoValor));
+				String newValue = (String) table.getModel().getValueAt(row, column);
+				String registerName = (String) table.getModel().getValueAt(row, column-1);
+				p.regs.get(registerName).setValue(Integer.decode(newValue));
 				
 			}
 		});
@@ -552,7 +549,7 @@ public class UI {
 		String s1 = "0x";
 		String s2;
 		
-		if(reg.equals("pc")) s2 = Integer.toHexString(cu.pc);
+		if(reg.equals("pc")) s2 = Integer.toHexString(controlUnit.pc);
 		else s2 = Integer.toHexString(p.getRegister().get(reg).getValue());
 		
 		for(int i=0; i < 8 - s2.length(); i++){

@@ -14,8 +14,8 @@ public class Main {
 		Processor p = new Processor();
 		ALU ALU = new ALU();
 		Parser mont = new Parser(p);
-		CU CU = new CU(p, ALU, mont);
+		ControlUnit ControlUnit = new ControlUnit(p, ALU, mont);
 		@SuppressWarnings("unused")
-		Uranus ur = new Uranus(p, mont, CU);
+		Uranus ur = new Uranus(p, mont, ControlUnit);
 	}
 }
