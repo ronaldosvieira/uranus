@@ -18,7 +18,7 @@ public class SplashScreen extends JWindow {
 
         // Sets the size and position of the window
         int width = 450;
-        int height = 253;
+        int height = 252;
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (screen.width - width) / 2;
         int y = (screen.height - height) / 2;

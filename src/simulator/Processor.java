@@ -1,6 +1,8 @@
 package simulator;
 
+import java.io.*;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 public class Processor {
@@ -10,6 +12,31 @@ public class Processor {
     public Processor() {
         regs = new TreeMap<>();
         ops = new TreeMap<>();
+
+        // TODO: make it read all the registers and operations from a file
+        /*
+        FileReader fr = null;
+        try {
+            fr = new FileReader(new File("simulator/data.txt"));
+            BufferedReader br = new BufferedReader(fr);
+
+            while (br.ready()) {
+                StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+
+                while (st.hasMoreElements()) {
+                    String registerName = st.nextToken();
+                    String registerAddress = st.nextToken();
+
+                    regs.put(registerName, new Register(registerAddress));
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
 
         regs.put("$zero", new Register("00000"));
         regs.put("$at", new Register("00001"));

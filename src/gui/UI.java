@@ -72,16 +72,16 @@ public class UI {
 	
 	private Processor p;
 	private Memory m;
-	private Parser mont;
+	private Parser parser;
 	private ControlUnit controlUnit;
 
 	/**
 	 * Create the application.
 	 */
-	public UI(Processor p, Memory m, Parser mont, ControlUnit controlUnit){
+	public UI(Processor p, Memory m, Parser parser, ControlUnit controlUnit){
 		this.p = p;
 		this.m = m;
-		this.mont = mont;
+		this.parser = parser;
 		this.controlUnit = controlUnit;
 		initialize();
 		this.getFrmUranus().setVisible(true);
@@ -122,10 +122,10 @@ public class UI {
 					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
 		);
 		
-		JButton btnNovo = new JButton("New");
-		btnNovo.setIcon(new ImageIcon(getClass().getResource("/img/novo.png")));
-		toolBar.add(btnNovo);
-		btnNovo.addMouseListener(new MouseAdapter(){
+		btnNew = new JButton("New");
+		btnNew.setIcon(new ImageIcon(getClass().getResource("/img/new.png")));
+		toolBar.add(btnNew);
+		btnNew.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				addNewEditorTab("Untitled");
@@ -133,7 +133,7 @@ public class UI {
 		});
 		
 		btnOpen = new JButton("Open");
-		btnOpen.setIcon(new ImageIcon(getClass().getResource("/img/abrir.png")));
+		btnOpen.setIcon(new ImageIcon(getClass().getResource("/img/open.png")));
 		toolBar.add(btnOpen);
 		btnOpen.addMouseListener(new MouseAdapter() {
 			@Override
@@ -177,7 +177,7 @@ public class UI {
 		});
 		
 		btnSave = new JButton("Save");
-		btnSave.setIcon(new ImageIcon(getClass().getResource("/img/salvar.png")));
+		btnSave.setIcon(new ImageIcon(getClass().getResource("/img/save.png")));
 		toolBar.add(btnSave);
 		btnSave.addMouseListener(new MouseAdapter() {
 			@Override
@@ -217,7 +217,7 @@ public class UI {
 		});
 		
 		btnClose = new JButton("Close");
-		btnClose.setIcon(new ImageIcon(getClass().getResource("/img/fechar.png")));
+		btnClose.setIcon(new ImageIcon(getClass().getResource("/img/close.png")));
 		toolBar.add(btnClose);
 		btnClose.addMouseListener(new MouseAdapter() {
 			@Override
@@ -232,7 +232,7 @@ public class UI {
 		});
 		
 		btnBuild = new JButton("Build");
-		btnBuild.setIcon(new ImageIcon(getClass().getResource("/img/construir.png")));
+		btnBuild.setIcon(new ImageIcon(getClass().getResource("/img/build.png")));
 		toolBar.add(btnBuild);
 		btnBuild.addMouseListener(new MouseAdapter() {
 			@Override
@@ -252,15 +252,15 @@ public class UI {
 					}
 					try {
 						console.setText("");
-						mont.setNewList(a);
-						boolean isBuilt = mont.setInstrucao();
-						mont.retirarLabels();
+						parser.setNewList(a);
+						boolean isBuilt = parser.setInstrucao();
+						parser.retirarLabels();
 						if (isBuilt) {
 							addNewRunTab(editorTB.getTitleAt(editorTB.getSelectedIndex()) + " (build)");
 							String built = "";
-							for (int i = 0; i < mont.instrucoes.size(); i++) {
-								built += mont.instrucoes.get(i);
-								if (i != mont.instrucoes.size() - 1) {
+							for (int i = 0; i < parser.instrucoes.size(); i++) {
+								built += parser.instrucoes.get(i);
+								if (i != parser.instrucoes.size() - 1) {
 									built += "\n";
 								}
 							}
@@ -283,7 +283,7 @@ public class UI {
 		});
 		
 		btnExecute = new JButton("Execute");
-		btnExecute.setIcon(new ImageIcon(getClass().getResource("/img/executar.png")));
+		btnExecute.setIcon(new ImageIcon(getClass().getResource("/img/execute.png")));
 		toolBar.add(btnExecute);
 		btnExecute.addMouseListener(new MouseAdapter() {
 			@Override
@@ -313,7 +313,7 @@ public class UI {
 		});
 		
 		btnExecuteStep = new JButton("Execute Step");
-		btnExecuteStep.setIcon(new ImageIcon(getClass().getResource("/img/executar_passo.png")));
+		btnExecuteStep.setIcon(new ImageIcon(getClass().getResource("/img/execute_step.png")));
 		toolBar.add(btnExecuteStep);
 		btnExecuteStep.addMouseListener(new MouseAdapter() {
 			@Override
@@ -343,7 +343,7 @@ public class UI {
 		});
 		
 		btnReset = new JButton("Reset");
-		btnReset.setIcon(new ImageIcon(getClass().getResource("/img/resetar.png")));
+		btnReset.setIcon(new ImageIcon(getClass().getResource("/img/reset.png")));
 		toolBar.add(btnReset);
 		btnReset.addMouseListener(new MouseAdapter() {
 			@Override
@@ -351,7 +351,7 @@ public class UI {
 				m.clear();
 				p.resetRegisters();
 				controlUnit.pc = 0;
-				mont.instrucoes.clear();
+				parser.instrucoes.clear();
 				controlUnit.list.clear();
 				refreshTable();
 				console.setText("");
@@ -413,7 +413,7 @@ public class UI {
 		scrollPane_console.setViewportView(tabbedPane_2);
 		
 		frmUranus.getContentPane().setLayout(groupLayout);
-		frmUranus.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{toolBar, btnNovo, btnOpen, btnSave, btnBuild, btnExecute, btnExecuteStep, btnReset, splitPane, splitPane_1, console, tabbedPane_2}));
+		frmUranus.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{toolBar, btnNew, btnOpen, btnSave, btnBuild, btnExecute, btnExecuteStep, btnReset, splitPane, splitPane_1, console, tabbedPane_2}));
 	}
 
 	public void refreshTable() {
