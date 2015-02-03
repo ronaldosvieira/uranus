@@ -17,6 +17,10 @@ public class Register {
         this.value = Constant.toBinary(value);
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public long getUnsignedValue() {
         return Constant.toUnsignedInteger(value);
     }

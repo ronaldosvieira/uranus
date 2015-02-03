@@ -6,10 +6,12 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 public class Processor {
-    public Map<String, Register> regs;
-    public Map<String, Operation> ops;
+    private static Processor instance;
 
-    public Processor() {
+    private Map<String, Register> regs;
+    private Map<String, Operation> ops;
+
+    private Processor() {
         regs = new TreeMap<>();
         ops = new TreeMap<>();
 
@@ -116,8 +118,14 @@ public class Processor {
         regs.get("$sp").setValue(4000);
     }
 
+    public static Processor getInstance() {
+        if (instance == null) instance = new Processor();
+
+        return instance;
+    }
+
     public String getRegisterAdress(String str) {
-        return regs.get(str).address;
+        return regs.get(str).getAddress();
     }
 
     public String getOpcode(String str) {
@@ -132,7 +140,7 @@ public class Processor {
         return regs;
     }
 
-    public Register getRegister(String str) {
+    public Register getRegisterByAddress(String str) {
         switch (str) {
             case "00000":
                 return regs.get("$zero");
@@ -201,6 +209,10 @@ public class Processor {
             default:
                 return null;
         }
+    }
+
+    public Register getRegisterByName(String name) {
+        return regs.get(name);
     }
 
     public void resetRegisters() {

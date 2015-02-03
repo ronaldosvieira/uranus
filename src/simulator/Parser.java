@@ -238,7 +238,7 @@ public class Parser {
                 rs = p.getRegisterAdress(tokens.get(1));
                 instrucaoBinario = opcode + rs + rt + rd + shamt + funct;
                 m.setWord(instrucaoBinario, cont);
-                p.getRegister(rs).setValue(cont);
+                p.getRegisterByAddress(rs).setValue(cont);
             } else if (str.matches(formato_bne_beq)) {
                 lab = tokens.get(3);
                 int endereco = (instrucoes.indexOf(lab + ":") * 4) - 4;
